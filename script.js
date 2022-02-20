@@ -1,25 +1,25 @@
 const targetWords = [
-  "goose",
-  "murre",
   "snipe",
-  "macaw",
-  "vireo",
-  "booby",
-  "finch",
-  "grebe",
-  "heron",
-  "egret",
-  "crane",
-  "mynah",
-  "quail",
-  "eagle",
-  "swift",
-  "stork",
-  "raven",
-  "robin",
-  "junco",
+  "murre",
   "eider",
   "owlet",
+  "vireo",
+  "mynah",
+  "finch",
+  "heron",
+  "eagle",
+  "macaw",
+  "goose",
+  "crane",
+  "swift",
+  "booby",
+  "raven",
+  "grebe",
+  "quail",
+  "junco",
+  "egret",
+  "stork",
+  "robin",
   "stilt",
 ]
 const dictionary = [
@@ -96,6 +96,7 @@ const dictionary = [
   "kites",
   "wrens",
   "ruffs",
+  "rooks",
   "cocks",
   "terns",
   "gulls",
@@ -142,6 +143,7 @@ const dictionary = [
   "fowls",
   "ornis",
 ]
+
 const WORD_LENGTH = 5
 const FLIP_ANIMATION_DURATION = 500
 const DANCE_ANIMATION_DURATION = 1000
@@ -151,8 +153,9 @@ const guessGrid = document.querySelector("[data-guess-grid]")
 const offsetFromDate = new Date(2022, 0, 1)
 const msOffset = Date.now() - offsetFromDate
 const dayOffset = msOffset / 1000 / 60 / 60 / 24
-const targetWord = targetWords[Math.floor(Math.random() * targetWords.length)]
-                   // targetWords[Math.floor(dayOffset) % targetWords.length]
+const queryParams = new URLSearchParams(window.location.search)
+const targetWord = queryParams.has('random') ? targetWords[Math.floor(Math.random() * targetWords.length)]
+                                             : targetWords[Math.floor(dayOffset) % targetWords.length]
 
 function startInteraction() {
   document.addEventListener("click", handleMouseClick)
