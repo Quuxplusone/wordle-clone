@@ -91,33 +91,8 @@
         overflow-y: hidden;
       }
 
-.key {
-  font-size: inherit;
-  grid-column: span 2;
-  border: none;
-  padding: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: var(--key-bg);
-  color: var(--key-text-color);
-  text-transform: uppercase;
-  border-radius: .25em;
-  cursor: pointer;
-  user-select: none;
-}
-
-.key.large {
-  grid-column: span 3;
-}
-
-.key > svg {
-  width: 1.75em;
-  height: 1.75em;
-}
-
-.key:hover, .key:focus {
-  --lightness-offset: 10%;
+.key svg {
+  pointer-events: none;
 }
 
 .key.absent {
@@ -146,139 +121,60 @@
   margin-bottom: 1em;
 }
 
-
-  :host {
-    display: inline-block;
-  }
-  .tile {
-    width: 100%;
-    display: inline-flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 2rem;
-    line-height: 2rem;
-    font-weight: bold;
-    vertical-align: middle;
-    box-sizing: border-box;
-    color: var(--tile-text-color);
-    text-transform: uppercase;
-    user-select: none;
-  }
-  .tile::before {
-    content: '';
-    display: inline-block;
-    padding-bottom: 100%;
-  }
-
-  /* Allow tiles to be smaller on small screens */
-  @media (max-height: 600px) {
-    .tile {
-      font-size: 1em;
-      line-height: 1em;
-    }
-  }
-
-  .tile[data-state='empty'] {
-    border: 2px solid var(--color-tone-4);
-  }
-  .tile[data-state='active'] {
-    background-color: var(--color-tone-7);
-    border: 2px solid var(--color-tone-3);
-    color: var(--color-tone-1);
-  }
-  .tile[data-state='correct'] {
-    background-color: var(--color-correct);
-  }
-  .tile[data-state='present'] {
-    background-color: var(--color-present);
-  }
-  .tile[data-state='absent'] {
-    background-color: var(--color-absent);
-  }
-
-  .tile[data-animation='pop'] {
-    animation-name: PopIn;
-    animation-duration: 100ms;
-  }
-
-  @keyframes PopIn {
-    from {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-
-    40% {
-      transform: scale(1.1);
-      opacity: 1;
-    }
-  }
-  .tile[data-animation='flip-in'] {
-    animation-name: FlipIn;
-    animation-duration: 250ms;
-    animation-timing-function: ease-in;
-  }
-  @keyframes FlipIn {
-    0% {
-      transform: rotateX(0);
-    }
-    100% {
-      transform: rotateX(-90deg);
-    }
-  }
-  .tile[data-animation='flip-out'] {
-    animation-name: FlipOut;
-    animation-duration: 250ms;
-    animation-timing-function: ease-in;
-  }
-  @keyframes FlipOut {
-    0% {
-      transform: rotateX(-90deg);
-    }
-    100% {
-      transform: rotateX(0);
-    }
-  }
+:host {
+  display: inline-block;
+}
 
 .tile {
-  font-size: 2em;
-  color: var(--tile-text-color);
-  text-transform: uppercase;
-  font-weight: bold;
-  display: flex;
+  width: 100%;
+  display: inline-flex;
   justify-content: center;
   align-items: center;
+  font-size: 2rem;
+  line-height: 2rem;
+  font-weight: bold;
   vertical-align: middle;
+  box-sizing: border-box;
+  color: var(--tile-text-color);
+  text-transform: uppercase;
   user-select: none;
-  transition: transform 250ms linear;
+  transition: transform 250ms linear; // for "flip"
+}
+.tile::before {
+  content: '';
+  display: inline-block;
+  padding-bottom: 100%;
 }
 
-.tile[data-state="wrong"] {
-  border: none;
-  background-color: hsl(240, 2%, 23%);
+/* Allow tiles to be smaller on small screens */
+@media (max-height: 600px) {
+  .tile {
+    font-size: 1em;
+    line-height: 1em;
+  }
 }
 
-.tile[data-state="wrong-location"] {
-  border: none;
-  background-color: hsl(49, 51%, 47%);
+.tile[data-state='empty'] {
+  border: 2px solid var(--color-tone-4);
 }
-
-.tile[data-state="correct"] {
-  border: none;
-  background-color: hsl(115, 29%, 43%);
+.tile[data-state='active'] {
+  background-color: var(--color-tone-7);
+  border: 2px solid var(--color-tone-3);
+  color: var(--color-tone-1);
+}
+.tile[data-state='correct'] {
+  background-color: var(--color-correct);
+}
+.tile[data-state='present'] {
+  background-color: var(--color-present);
+}
+.tile[data-state='absent'] {
+  background-color: var(--color-absent);
 }
 
 .tile.shake-horizontal {
   animation: shake-horizontal 800ms cubic-bezier(.455,.03,.515,.955) both;
 }
-
-.tile.dance {
-  animation: dance 500ms ease-in-out;
-}
-
-.tile.flip {
-  transform: rotateX(90deg);
-}
-
 @keyframes shake-horizontal {
   0%, 100% {
     transform: translateX(0);
@@ -297,6 +193,9 @@
   }
 }
 
+.tile.dance {
+  animation: dance 1000ms;
+}
 @keyframes dance {
   0%, 20%, 100% {
     transform: translateY(0);
@@ -313,6 +212,10 @@
   80% {
     transform: translateY(2px);
   }
+}
+
+.tile.flip {
+  transform: rotateX(90deg);
 }
 
 .alert-container {
@@ -387,7 +290,7 @@ header .title {
   height: var(--keyboard-height);
 }
 
-.row {
+#keyboard .row {
   display: flex;
   width: 100%;
   margin: 0 auto 8px;
@@ -414,15 +317,20 @@ header .title {
   text-transform: uppercase;
   -webkit-tap-highlight-color: rgba(0,0,0,0.3);
 }
-button:focus {
+#keyboard .spacer {
+  flex: 0.5;
+}
+#keyboard button.large {
+  flex: 1.5;
+  font-size: 12px;
+}
+#keyboard button:focus {
   outline: none;
 }
-
-button.fade {
+#keyboard button.fade {
   transition: background-color 0.1s ease, color 0.1s ease;
 }
-
-button:last-of-type {
+#keyboard button:last-of-type {
   margin: 0;
 }
 
@@ -431,6 +339,9 @@ button.icon {
   border: none;
   cursor: pointer;
   padding: 0 4px;
-  width: 24px;
-  height: 27.5px;
+}
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+  game-icon {
+    padding: 0 16px;
+  }
 }

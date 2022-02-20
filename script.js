@@ -31,6 +31,7 @@ const dictionary = [
   "diver",
   "wader",
   "piper",
+  "galah",
   "twite",
   "wonga",
   "hylia",
@@ -143,7 +144,7 @@ const dictionary = [
 ]
 const WORD_LENGTH = 5
 const FLIP_ANIMATION_DURATION = 500
-const DANCE_ANIMATION_DURATION = 500
+const DANCE_ANIMATION_DURATION = 1000
 const keyboard = document.querySelector("[data-keyboard]")
 const alertContainer = document.querySelector("[data-alert-container]")
 const guessGrid = document.querySelector("[data-guess-grid]")
@@ -166,8 +167,6 @@ function stopInteraction() {
 window.onload = startInteraction
 
 function handleMouseClick(e) {
-  window.lastE = e
-  console.log(e)
   if (e.target.matches("[data-key]")) {
     pressKey(e.target.dataset.key)
     return
@@ -364,6 +363,6 @@ function danceTiles(tiles) {
         },
         { once: true }
       )
-    }, (index * DANCE_ANIMATION_DURATION) / 5)
+    }, (index * 100))
   })
 }
