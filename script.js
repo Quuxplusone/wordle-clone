@@ -15467,11 +15467,11 @@ function showAlert(message, duration = 1000) {
 
 function shakeTiles(tiles) {
   tiles.forEach(tile => {
-    tile.classList.add("shake")
+    tile.classList.add("shake-horizontal")
     tile.addEventListener(
       "animationend",
       () => {
-        tile.classList.remove("shake")
+        tile.classList.remove("shake-horizontal")
       },
       { once: true }
     )

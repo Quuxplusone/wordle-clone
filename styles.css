@@ -114,8 +114,8 @@ body {
   background-color: hsl(115, 29%, 43%);
 }
 
-.tile.shake {
-  animation: shake 250ms ease-in-out;
+.tile.shake-horizontal {
+  animation: shake-horizontal 800ms cubic-bezier(.455,.03,.515,.955) both;
 }
 
 .tile.dance {
@@ -126,29 +126,21 @@ body {
   transform: rotateX(90deg);
 }
 
-@keyframes shake {
-  10% {
-    transform: translateX(-5%);
-  }
-
-  30% {
-    transform: translateX(5%);
-  }
-
-  50% {
-    transform: translateX(-7.5%);
-  }
-
-  70% {
-    transform: translateX(7.5%);
-  }
-
-  90% {
-    transform: translateX(-5%);
-  }
-
-  100% {
+@keyframes shake-horizontal {
+  0%, 100% {
     transform: translateX(0);
+  }
+  10%, 30%, 50%, 70% {
+    transform: translateX(-10px);
+  }
+  20%, 40%, 60% {
+    transform: translateX(10px);
+  }
+  80% {
+    transform: translateX(8px);
+  }
+  90% {
+    transform: translateX(-8px);
   }
 }
 
