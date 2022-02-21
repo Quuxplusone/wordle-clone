@@ -95,21 +95,6 @@
   pointer-events: none;
 }
 
-.key.absent {
-  background-color: var(--key-bg-absent);
-  color: var(--key-evaluated-text-color);
-}
-
-.key.present {
-  background-color: var(--key-bg-present);
-  color: var(--key-evaluated-text-color);
-}
-
-.key.correct {
-  background-color: var(--key-bg-correct);
-  color: var(--key-evaluated-text-color);
-}
-
 .guess-grid {
   display: grid;
   justify-content: center;
@@ -162,6 +147,11 @@
   border: 2px solid var(--color-tone-3);
   color: var(--color-tone-1);
 }
+.tile[data-state='example'] {
+  background-color: var(--color-tone-7);
+  border: 2px solid var(--color-tone-3);
+  color: var(--color-tone-1);
+}
 .tile[data-state='correct'] {
   background-color: var(--color-correct);
 }
@@ -199,13 +189,13 @@
 @keyframes dance {
   0%, 20%, 100% {
     transform: translateY(0);
-  }  
+  }
   40% {
     transform: translateY(-30px);
-  }  
+  }
   50% {
     transform: translateY(5px);
-  }  
+  }
   60% {
     transform: translateY(-15px);
   }
@@ -334,6 +324,19 @@ header .title {
   margin: 0;
 }
 
+#keyboard .key.absent {
+  background-color: var(--key-bg-absent);
+  color: var(--key-evaluated-text-color);
+}
+#keyboard .key.present {
+  background-color: var(--key-bg-present);
+  color: var(--key-evaluated-text-color);
+}
+#keyboard .key.correct {
+  background-color: var(--key-bg-correct);
+  color: var(--key-evaluated-text-color);
+}
+
 button.icon {
   background: none;
   border: none;
@@ -341,7 +344,107 @@ button.icon {
   padding: 0 4px;
 }
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
-  game-icon {
+  button.icon {
     padding: 0 16px;
   }
+}
+
+button svg {
+  pointer-events: none;
+}
+
+.overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  justify-content: center;
+  background-color: var(--color-background);
+  animation: SlideIn 100ms linear;
+  z-index: 2000;
+}
+
+header .modal-title {
+  font-weight: bold;
+  text-transform: uppercase;
+  text-align: center;
+  pointer-events: none;
+}
+
+.overlay button.icon {
+  position: relative;
+  right: 0;
+  user-select: none;
+  cursor: pointer;
+}
+
+.overlay .content {
+  margin: 0 auto;
+  border-radius: 8px;
+  border: 1px solid var(--color-tone-6);
+  background-color: var(--modal-content-bg);
+  color: var(--color-tone-1);
+  box-shadow: 0 4px 23px 0 rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: var(--game-max-width);
+  max-height: 90%;
+  overflow-y: auto;
+  padding: 16px;
+  box-sizing: border-box;
+  animation: SlideIn 200ms;
+}
+@keyframes SlideIn {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+}
+
+.overlay .content.closing {
+  animation: SlideOut 200ms;
+}
+@keyframes SlideOut {
+  0% {
+    transform: translateY(0px);
+    opacity: 1;
+  }
+  90% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+}
+
+#help-modal .instructions {
+  font-size: 14px;
+  color: var(--color-tone-1);
+}
+#help-modal .examples {
+  border-bottom: 1px solid var(--color-tone-4);
+  border-top: 1px solid var(--color-tone-4);
+}
+#help-modal .example {
+  margin-top: 24px;
+  margin-bottom: 24px;
+}
+#help-modal .example-grid {
+  display: grid;
+  justify-content: center;
+  align-content: center;
+  flex-grow: 1;
+  grid-template-columns: repeat(5, 4em);
+  grid-template-rows: repeat(1, 4em);
+  gap: .25em;
+  margin-bottom: 1em;
+}
+#help-modal section {
+  padding: 16px;
+  padding-top: 0px;
 }

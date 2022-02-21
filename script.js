@@ -184,6 +184,16 @@ function handleMouseClick(e) {
     deleteKey()
     return
   }
+
+  if (e.target.matches("#help-button")) {
+    document.getElementById("help-modal").hidden = false
+    return
+  }
+
+  if (e.target.matches("#close-help-button")) {
+    document.getElementById("help-modal").hidden = true
+    return
+  }
 }
 
 function handleKeyPress(e) {
