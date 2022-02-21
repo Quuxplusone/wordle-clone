@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
-  <title>Birdle</title>
+  <title>Evirdle</title>
 </head>
 <body>
   <div id="game">
@@ -18,7 +18,7 @@
             </svg>
         </button>
       </div>
-      <div class="title">BIRDLE</div>
+      <div class="title">EVIRDLE</div>
       <div class="menu">
         <button id="statistics-button" class="icon" aria-label="statistics">
             <svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24">
@@ -46,43 +46,42 @@
         </header>
         <section>
           <div class="instructions">
-            <p>Guess the <strong>BIRDLE</strong> in six tries.</p>
-            <p>Each guess must be a valid five-letter bird. Hit the enter button to submit.</p>
-            <p>After each guess, the color of the tiles will change to show how close your guess was to the bird.</p>
+            <p>Guess the <strong>EVIRDLE</strong> in six tries.</p>
+            <p>Each guess must be a valid five-letter word. Hit the enter button to submit.</p>
+            <p>After each guess, the color of the tiles will change to show how close your guess was to the word.</p>
             <div class="examples">
               <p><strong>Examples</strong></p>
               <div class="example">
                 <div class="example-grid">
-                  <div class="tile" data-state="correct">b</div>
-                  <div class="tile" data-state="example">i</div>
+                  <div class="tile" data-state="correct">w</div>
+                  <div class="tile" data-state="example">e</div>
+                  <div class="tile" data-state="example">a</div>
                   <div class="tile" data-state="example">r</div>
-                  <div class="tile" data-state="example">d</div>
+                  <div class="tile" data-state="example">y</div>
+                </div>
+                <p>The letter <strong>W</strong> is in the word and in the correct spot.</p>
+              </div>
+              <div class="example">
+                <div class="example-grid">
+                  <div class="tile" data-state="example">p</div>
+                  <div class="tile" data-state="present">i</div>
+                  <div class="tile" data-state="example">l</div>
+                  <div class="tile" data-state="example">l</div>
                   <div class="tile" data-state="example">s</div>
                 </div>
-                <p>The letter <strong>B</strong> is in the word and in the correct spot.</p>
+                <p>The letter <strong>I</strong> is in the word but in the wrong spot.</p>
               </div>
               <div class="example">
                 <div class="example-grid">
-                  <div class="tile" data-state="example">c</div>
-                  <div class="tile" data-state="present">h</div>
-                  <div class="tile" data-state="example">i</div>
-                  <div class="tile" data-state="example">c</div>
-                  <div class="tile" data-state="example">k</div>
-                </div>
-                <p>The letter <strong>H</strong> is in the word but in the wrong spot.</p>
-              </div>
-              <div class="example">
-                <div class="example-grid">
-                  <div class="tile" data-state="example">w</div>
+                  <div class="tile" data-state="example">v</div>
                   <div class="tile" data-state="example">a</div>
-                  <div class="tile" data-state="example">d</div>
-                  <div class="tile" data-state="absent">e</div>
-                  <div class="tile" data-state="example">r</div>
+                  <div class="tile" data-state="example">g</div>
+                  <div class="tile" data-state="absent">u</div>
+                  <div class="tile" data-state="example">e</div>
                 </div>
-                <p>The letter <strong>E</strong> is not in the word in any spot.</p>
+                <p>The letter <strong>U</strong> is not in the word in any spot.</p>
               </div>
             </div>
-            <p><strong>A new BIRDLE will be available each day!</strong></p>
           </div>
       </div>
     </div>
