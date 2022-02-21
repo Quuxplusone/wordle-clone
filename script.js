@@ -778,8 +778,12 @@ const offsetFromDate = new Date(2022, 0, 1)
 const msOffset = Date.now() - offsetFromDate
 const dayOffset = msOffset / 1000 / 60 / 60 / 24
 const queryParams = new URLSearchParams(window.location.search)
-const targetWord = queryParams.has('random') ? targetWords[Math.floor(Math.random() * targetWords.length)]
-                                             : targetWords[Math.floor(dayOffset) % targetWords.length]
+
+// Use as answers only those words with no doublets (e.g. not FIZZY or BLOOM).
+let currentWords = targetWords.filter(w => !w.match("(.)\\1"))
+
+// Use as answers only those words with all five letters different (e.g. not APART).
+// let currentWords = targetWords.filter(w => ((new Set(w)).size == WORD_LENGTH))
 
 function startInteraction() {
   document.addEventListener("click", handleMouseClick)
@@ -868,23 +872,68 @@ function submitGuess() {
   }, "")
 
   if (!targetWords.includes(guess) && !dictionary.includes(guess)) {
-    showAlert("Not in bird list")
+    showAlert("Not in word list")
     shakeTiles(activeTiles)
     return
   }
 
   stopInteraction()
-  const colors = computeColors(targetWord, guess)
-  activeTiles.forEach((tile, index, array) => flipTile(tile, index, array, guess, colors[index]))
+
+  let results = {}
+  for (let i = 0; i < currentWords.length; ++i) {
+    const w = currentWords[i]
+    const colors = computeColors(w, guess)
+    results[colors] = (results[colors] || [])
+    results[colors].push(w)
+  }
+  // Choose the biggest bucket with at most one yellow;
+  // or the biggest bucket with at most one green;
+  // etc.
+  let ksByScore = []
+  for (let k in results) {
+    let numAbsents = 0
+    let numNonGreens = 0
+    for (let i = 0; i < WORD_LENGTH; ++i) {
+      if (k[i] === '-') numAbsents += 1
+      if (k[i] !== 'g') numNonGreens += 1
+    }
+    if (numAbsents === WORD_LENGTH-1 && numNonGreens == WORD_LENGTH) {
+      // One yellow is treated the same as no yellows.
+      numAbsents = WORD_LENGTH
+    }
+    const score = 1e7 * numAbsents + 1e6 * numNonGreens + results[k].length
+    if (k === 'ggggg' && Object.keys(results).length !== 1) {
+      // Don't bother to consider "You win!", if there's any alternative.
+    } else {
+      ksByScore.push([score, Math.random(), k])
+    }
+  }
+
+  // Choose one of the top two candidates.
+  ksByScore.sort().reverse()
+  console.log(ksByScore)
+  const bestK = (ksByScore.length === 1 || Math.random() < 0.5) ?
+    ksByScore[0][2] : ksByScore[1][2];
+
+  let colors = []
+  for (let c of bestK) {
+    if (c === '-') colors.push("absent")
+    if (c === 'y') colors.push("present")
+    if (c === 'g') colors.push("correct")
+  }
+  currentWords = results[bestK]
+  const youWon = (bestK === 'ggggg')
+  console.assert(!(youWon && currentWords.length !== 1))
+  activeTiles.forEach((tile, index, array) => flipTile(tile, index, array, guess, colors[index], youWon))
 }
 
 function computeColors(targetWord, guess) {
-  const colors = Array(WORD_LENGTH).fill("absent")
+  let colors = "-----".split("")
   const outOfPlace = {}
   for (let i = 0; i < WORD_LENGTH; ++i) {
     const letter = targetWord[i]
     if (guess[i] === letter) {
-      colors[i] = "correct"
+      colors[i] = "g"
     } else {
       outOfPlace[letter] = (outOfPlace[letter] || 0) + 1
     }
@@ -893,15 +942,15 @@ function computeColors(targetWord, guess) {
     const letter = guess[i]
     if (targetWord[i] !== letter) {
       if (outOfPlace[letter]) {
-        colors[i] = "present"
+        colors[i] = "y"
         outOfPlace[letter] -= 1
       }
     }
   }
-  return colors
+  return colors.join("")
 }
 
-function flipTile(tile, index, array, guess, newColor) {
+function flipTile(tile, index, array, guess, newColor, youWon) {
   const letter = tile.dataset.letter
   const key = keyboard.querySelector(`[data-key="${letter}"i]`)
 
@@ -922,7 +971,7 @@ function flipTile(tile, index, array, guess, newColor) {
           "transitionend",
           () => {
             startInteraction()
-            checkWinLose(guess, array)
+            checkWinLose(youWon, array)
           },
           { once: true }
         )
@@ -964,11 +1013,11 @@ function shakeTiles(tiles) {
   })
 }
 
-function checkWinLose(guess, tiles) {
+function checkWinLose(youWon, tiles) {
   const usedRows = guessGrid.querySelectorAll("[data-letter]").length / WORD_LENGTH
   const remainingRows = guessGrid.querySelectorAll(":not([data-letter])").length / WORD_LENGTH
 
-  if (guess === targetWord) {
+  if (youWon) {
     const compliments = ["Genius", "Magnificent", "Impressive", "Splendid", "Great", "Phew"]
     showAlert(compliments[usedRows - 1], 5000)
     danceTiles(tiles)
@@ -977,7 +1026,7 @@ function checkWinLose(guess, tiles) {
   }
 
   if (remainingRows === 0) {
-    showAlert(targetWord.toUpperCase(), null)
+    showAlert(currentWords[0].toUpperCase(), null)
     stopInteraction()
   }
 }
