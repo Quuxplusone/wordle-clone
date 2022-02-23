@@ -1,27 +1,3 @@
-const targetWords = [
-  "snipe",
-  "murre",
-  "eider",
-  "owlet",
-  "vireo",
-  "mynah",
-  "finch",
-  "heron",
-  "eagle",
-  "macaw",
-  "goose",
-  "crane",
-  "swift",
-  "booby",
-  "raven",
-  "grebe",
-  "quail",
-  "junco",
-  "egret",
-  "stork",
-  "robin",
-  "stilt",
-]
 const dictionary = [
   // Singular bird names
   "drake",
@@ -144,6 +120,31 @@ const dictionary = [
   "ornis",
 ]
 
+const targetWords = [
+  "snipe",
+  "murre",
+  "eider",
+  "owlet",
+  "vireo",
+  "mynah",
+  "finch",
+  "heron",
+  "eagle",
+  "macaw",
+  "goose",
+  "crane",
+  "swift",
+  "booby",
+  "raven",
+  "grebe",
+  "quail",
+  "junco",
+  "egret",
+  "stork",
+  "robin",
+  "stilt",
+]
+
 const WORD_LENGTH = 5
 const FLIP_ANIMATION_DURATION = 500
 const DANCE_ANIMATION_DURATION = 1000
@@ -156,6 +157,7 @@ const dayOffset = msOffset / 1000 / 60 / 60 / 24
 const queryParams = new URLSearchParams(window.location.search)
 const targetWord = queryParams.has('random') ? targetWords[Math.floor(Math.random() * targetWords.length)]
                                              : targetWords[Math.floor(dayOffset) % targetWords.length]
+let gameOver = false
 
 restoreSettings()
 startInteraction()
@@ -171,20 +173,22 @@ function stopInteraction() {
 }
 
 function handleMouseClick(e) {
-  if (e.target.matches("[data-key]")) {
+  if (e.target.matches("[data-key]") && !gameOver) {
     pressKey(e.target.dataset.key)
-  } else if (e.target.matches("[data-enter]")) {
+  } else if (e.target.matches("[data-enter]") && !gameOver) {
     submitGuess()
-  } else if (e.target.matches("[data-delete]")) {
+  } else if (e.target.matches("[data-delete]") && !gameOver) {
     deleteKey()
   } else if (e.target.matches("#help-button")) {
     document.getElementById("help-modal").hidden = false
-  } else if (e.target.matches("#close-help-button")) {
-    document.getElementById("help-modal").hidden = true
   } else if (e.target.matches("#settings-button")) {
     document.getElementById("settings-modal").hidden = false
-  } else if (e.target.matches("#close-settings-button")) {
+  } else if (e.target.matches("#statistics-button")) {
+    document.getElementById("statistics-modal").hidden = false
+  } else if (e.target.matches(".close-modal-button") || e.target.matches(".overlay")) {
+    document.getElementById("help-modal").hidden = true
     document.getElementById("settings-modal").hidden = true
+    document.getElementById("statistics-modal").hidden = true
   } else if (e.target.matches("#dark-theme")) {
     const on = e.target.toggleAttribute("checked")
     document.querySelector("body").classList.toggle("nightmode", on)
@@ -193,6 +197,16 @@ function handleMouseClick(e) {
     const on = e.target.toggleAttribute("checked")
     document.querySelector("body").classList.toggle("colorblind", on)
     saveSettings()
+  } else if (e.target.matches("#share-button")) {
+    if (navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(window.unicodeGameTranscript).then(function() {
+        showAlert("Copied to clipboard")
+      }, function (err) {
+        showAlert("Copying failed: " + e)
+      });
+    } else {
+      showAlert("Copying failed: navigator.clipboard.writeText is not supported")
+    }
   }
 }
 
@@ -215,17 +229,10 @@ function restoreSettings() {
 function handleKeyPress(e) {
   if (e.key === "Enter") {
     submitGuess()
-    return
-  }
-
-  if (e.key === "Backspace" || e.key === "Delete") {
+  } else if (e.key === "Backspace" || e.key === "Delete") {
     deleteKey()
-    return
-  }
-
-  if (e.key.match(/^[a-z]$/)) {
+  } else if (e.key.match(/^[a-z]$/)) {
     pressKey(e.key)
-    return
   }
 }
 
@@ -361,17 +368,37 @@ function checkWinLose(guess, tiles) {
   const remainingRows = guessGrid.querySelectorAll(":not([data-letter])").length / WORD_LENGTH
 
   if (guess === targetWord) {
+    stopInteraction()
     const compliments = ["Genius", "Magnificent", "Impressive", "Splendid", "Great", "Phew"]
     showAlert(compliments[usedRows - 1], 5000)
     danceTiles(tiles)
+    window.unicodeGameTranscript = "Birdle #" + (targetWords.indexOf(targetWord) + 1) + " " + usedRows + "/6\n"
+  } else if (remainingRows === 0) {
     stopInteraction()
+    showAlert(targetWord.toUpperCase(), null)
+    window.unicodeGameTranscript = "Birdle #" + (targetWords.indexOf(targetWord) + 1) + " X/6\n"
+  } else {
     return
   }
 
-  if (remainingRows === 0) {
-    showAlert(targetWord.toUpperCase(), null)
-    stopInteraction()
+  let transcript = []
+  const greenSquare = document.querySelector("body").classList.contains("colorblind") ? "\u{1F7E7}" : "\u{1F7E9}"
+  const yellowSquare = document.querySelector("body").classList.contains("colorblind") ? "\u{1F7E6}" : "\u{1F7E8}"
+  const whiteSquare = document.querySelector("body").classList.contains("nightmode") ? "\u{2B1B}" : "\u{2B1C}"
+  for (let e of guessGrid.querySelectorAll("[data-letter]")) {
+    transcript.push(e.dataset.state == "correct" ? greenSquare :
+                    e.dataset.state == "present" ? yellowSquare : whiteSquare)
+    if (transcript.length === WORD_LENGTH) {
+      window.unicodeGameTranscript += transcript.join("") + "\n"
+      transcript = []
+    }
   }
+  console.assert(transcript.length === 0)
+
+  let e = document.querySelector("#statistics-button")
+  e.classList.toggle("disabled-button", false)
+  window.gameOver = true
+  startInteraction()
 }
 
 function danceTiles(tiles) {

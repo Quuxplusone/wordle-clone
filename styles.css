@@ -91,10 +91,6 @@
         overflow-y: hidden;
       }
 
-.key svg {
-  pointer-events: none;
-}
-
 .guess-grid {
   display: grid;
   justify-content: center;
@@ -342,11 +338,17 @@ button.icon {
   border: none;
   cursor: pointer;
   padding: 0 4px;
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
 }
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
   button.icon {
     padding: 0 16px;
   }
+}
+button.disabled-button {
+  display: hidden;
+  opacity: 0;
 }
 
 button svg {
@@ -359,8 +361,10 @@ button svg {
   height: 100%;
   top: 0;
   left: 0;
+  display: flex;
   justify-content: center;
-  background-color: var(--color-background);
+  align-items: center;
+  background-color: var(--opacity-50);
   animation: SlideIn 100ms linear;
   z-index: 2000;
 }
@@ -516,4 +520,55 @@ header .modal-title {
 }
 #settings-modal .control[checked] .knob {
   transform: translateX(calc(100% - 4px));
+}
+
+#statistics-modal .container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 0;
+}
+#statistics-modal .footer {
+  display: flex;
+  width: 100%;
+}
+#statistics-modal .countdown {
+  border-right: 1px solid var(--color-tone-1);
+  padding-right: 12px;
+  width: 50%;
+}
+#statistics-modal .share {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding-left: 12px;
+  width: 50%;
+}
+#statistics-modal button#share-button {
+  background-color: var(--key-bg-correct);
+  color: var(--key-evaluated-text-color);
+  font-family: inherit;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  user-select: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  -webkit-tap-highlight-color: rgba(0,0,0,0.3);
+  width: 80%;
+  font-size: 20px;
+  height: 52px;
+  -webkit-filter: brightness(100%);
+}
+#statistics-modal button#share-button:hover {
+  opacity: 0.9;
+}
+#statistics-modal button#share-button svg {
+  width: 24px;
+  height: 24px;
+  padding-left: 8px;
 }
