@@ -778,12 +778,16 @@ const offsetFromDate = new Date(2022, 0, 1)
 const msOffset = Date.now() - offsetFromDate
 const dayOffset = msOffset / 1000 / 60 / 60 / 24
 const queryParams = new URLSearchParams(window.location.search)
+let easyMode = false
 
 // Use as answers only those words with no doublets (e.g. not FIZZY or BLOOM).
 let currentWords = targetWords.filter(w => !w.match("(.)\\1"))
 
 // Use as answers only those words with all five letters different (e.g. not APART).
 // let currentWords = targetWords.filter(w => ((new Set(w)).size == WORD_LENGTH))
+
+restoreSettings()
+startInteraction()
 
 function startInteraction() {
   document.addEventListener("click", handleMouseClick)
@@ -795,33 +799,53 @@ function stopInteraction() {
   document.removeEventListener("keydown", handleKeyPress)
 }
 
-window.onload = startInteraction
-
 function handleMouseClick(e) {
   if (e.target.matches("[data-key]")) {
     pressKey(e.target.dataset.key)
-    return
-  }
-
-  if (e.target.matches("[data-enter]")) {
+  } else if (e.target.matches("[data-enter]")) {
     submitGuess()
-    return
-  }
-
-  if (e.target.matches("[data-delete]")) {
+  } else if (e.target.matches("[data-delete]")) {
     deleteKey()
-    return
-  }
-
-  if (e.target.matches("#help-button")) {
+  } else if (e.target.matches("#help-button")) {
     document.getElementById("help-modal").hidden = false
-    return
-  }
-
-  if (e.target.matches("#close-help-button")) {
+  } else if (e.target.matches("#close-help-button")) {
     document.getElementById("help-modal").hidden = true
-    return
+  } else if (e.target.matches("#settings-button")) {
+    document.getElementById("settings-modal").hidden = false
+  } else if (e.target.matches("#close-settings-button")) {
+    document.getElementById("settings-modal").hidden = true
+  } else if (e.target.matches("#easy-mode")) {
+    window.easyMode = e.target.toggleAttribute("checked")
+    saveSettings()
+  } else if (e.target.matches("#dark-theme")) {
+    const on = e.target.toggleAttribute("checked")
+    document.querySelector("body").classList.toggle("nightmode", on)
+    saveSettings()
+  } else if (e.target.matches("#color-blind-theme")) {
+    const on = e.target.toggleAttribute("checked")
+    document.querySelector("body").classList.toggle("colorblind", on)
+    saveSettings()
   }
+}
+
+function saveSettings() {
+  localStorage.setItem("evirdle-easymode", window.easyMode ? '1' : '0')
+  localStorage.setItem("evirdle-nightmode", document.querySelector("body").classList.contains("nightmode") ? '1' : '0')
+  localStorage.setItem("evirdle-colorblind", document.querySelector("body").classList.contains("colorblind") ? '1' : '0')
+}
+
+function restoreSettings() {
+  const easymode = parseInt(localStorage.getItem("evirdle-easymode") || '0')
+  const nightmode = parseInt(localStorage.getItem("evirdle-nightmode") || '0')
+  const colorblind = parseInt(localStorage.getItem("evirdle-colorblind") || '0')
+
+  window.easyMode = easymode
+  document.querySelector("body").classList.toggle("nightmode", nightmode)
+  document.querySelector("body").classList.toggle("colorblind", colorblind)
+
+  document.querySelector("#easy-mode").toggleAttribute("checked", easymode)
+  document.querySelector("#dark-theme").toggleAttribute("checked", nightmode)
+  document.querySelector("#color-blind-theme").toggleAttribute("checked", colorblind)
 }
 
 function handleKeyPress(e) {
@@ -901,19 +925,20 @@ function submitGuess() {
       // One yellow is treated the same as no yellows.
       numAbsents = WORD_LENGTH
     }
-    const score = 1e7 * numAbsents + 1e6 * numNonGreens + results[k].length
     if (k === 'ggggg' && Object.keys(results).length !== 1) {
       // Don't bother to consider "You win!", if there's any alternative.
+    } else if (window.easyMode) {
+      const score = -100 * results[k].length + 5 * numAbsents + numNonGreens + Math.random()
+      ksByScore.push([-score, k])
     } else {
-      ksByScore.push([score, Math.random(), k])
+      const score = 1e7 * numAbsents + 1e6 * numNonGreens + results[k].length + Math.random()
+      ksByScore.push([-score, k])
     }
   }
 
   // Choose one of the top two candidates.
-  ksByScore.sort().reverse()
-  console.log(ksByScore)
-  const bestK = (ksByScore.length === 1 || Math.random() < 0.5) ?
-    ksByScore[0][2] : ksByScore[1][2];
+  ksByScore.sort((a, b) => (a[0] - b[0]))
+  const bestK = (ksByScore.length === 1 || Math.random() < 0.5) ? ksByScore[0][1] : ksByScore[1][1]
 
   let colors = []
   for (let c of bestK) {
