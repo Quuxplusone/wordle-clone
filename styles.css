@@ -448,3 +448,72 @@ header .modal-title {
   padding: 16px;
   padding-top: 0px;
 }
+
+#settings-modal .setting {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--color-tone-4);
+  padding: 16px 0;
+}
+@media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
+  .setting {
+    padding: 16px;
+  }
+}
+#settings-modal .setting:last-child {
+  border-bottom: none;
+}
+
+#settings-modal a {
+  color: var(--color-tone-2);
+}
+#settings-modal a:visited {
+  color: var(--color-tone-2);
+}
+
+#settings-modal .title {
+  font-size: 18px;
+}
+#settings-modal .text {
+  padding-right: 8px;
+}
+#settings-modal .description {
+  font-size: 12px;
+  color: var(--color-tone-2);
+}
+
+#settings-modal .container {
+  display: flex;
+  justify-content: space-between;
+  pointer-events: none;
+}
+#settings-modal .switch {
+  height: 20px;
+  width: 32px;
+  vertical-align: middle;
+  background: var(--color-tone-3);
+  border-radius: 999px;
+  display: block;
+  position: relative;
+  pointer-events: none;
+}
+#settings-modal .control[checked] .switch {
+  background: var(--color-correct);
+}
+#settings-modal .knob {
+  display: block;
+  position: absolute;
+  left: 2px;
+  top: 2px;
+  height: calc(100% - 4px);
+  width: 50%;
+  border-radius: 8px;
+  background: var(--white);
+  transform: translateX(0);
+  transition: transform 0.3s;
+  pointer-events: none;
+}
+#settings-modal .control[checked] .knob {
+  transform: translateX(calc(100% - 4px));
+}

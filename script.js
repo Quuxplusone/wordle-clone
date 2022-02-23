@@ -157,6 +157,9 @@ const queryParams = new URLSearchParams(window.location.search)
 const targetWord = queryParams.has('random') ? targetWords[Math.floor(Math.random() * targetWords.length)]
                                              : targetWords[Math.floor(dayOffset) % targetWords.length]
 
+restoreSettings()
+startInteraction()
+
 function startInteraction() {
   document.addEventListener("click", handleMouseClick)
   document.addEventListener("keydown", handleKeyPress)
@@ -167,33 +170,46 @@ function stopInteraction() {
   document.removeEventListener("keydown", handleKeyPress)
 }
 
-window.onload = startInteraction
-
 function handleMouseClick(e) {
   if (e.target.matches("[data-key]")) {
     pressKey(e.target.dataset.key)
-    return
-  }
-
-  if (e.target.matches("[data-enter]")) {
+  } else if (e.target.matches("[data-enter]")) {
     submitGuess()
-    return
-  }
-
-  if (e.target.matches("[data-delete]")) {
+  } else if (e.target.matches("[data-delete]")) {
     deleteKey()
-    return
-  }
-
-  if (e.target.matches("#help-button")) {
+  } else if (e.target.matches("#help-button")) {
     document.getElementById("help-modal").hidden = false
-    return
-  }
-
-  if (e.target.matches("#close-help-button")) {
+  } else if (e.target.matches("#close-help-button")) {
     document.getElementById("help-modal").hidden = true
-    return
+  } else if (e.target.matches("#settings-button")) {
+    document.getElementById("settings-modal").hidden = false
+  } else if (e.target.matches("#close-settings-button")) {
+    document.getElementById("settings-modal").hidden = true
+  } else if (e.target.matches("#dark-theme")) {
+    const on = e.target.toggleAttribute("checked")
+    document.querySelector("body").classList.toggle("nightmode", on)
+    saveSettings()
+  } else if (e.target.matches("#color-blind-theme")) {
+    const on = e.target.toggleAttribute("checked")
+    document.querySelector("body").classList.toggle("colorblind", on)
+    saveSettings()
   }
+}
+
+function saveSettings() {
+  localStorage.setItem("birdle-nightmode", document.querySelector("body").classList.contains("nightmode") ? '1' : '0')
+  localStorage.setItem("birdle-colorblind", document.querySelector("body").classList.contains("colorblind") ? '1' : '0')
+}
+
+function restoreSettings() {
+  const nightmode = parseInt(localStorage.getItem("birdle-nightmode") || '0')
+  const colorblind = parseInt(localStorage.getItem("birdle-colorblind") || '0')
+
+  document.querySelector("body").classList.toggle("nightmode", nightmode)
+  document.querySelector("body").classList.toggle("colorblind", colorblind)
+
+  document.querySelector("#dark-theme").toggleAttribute("checked", nightmode)
+  document.querySelector("#color-blind-theme").toggleAttribute("checked", colorblind)
 }
 
 function handleKeyPress(e) {
