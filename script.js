@@ -183,12 +183,9 @@ function handleMouseClick(e) {
     document.getElementById("help-modal").hidden = false
   } else if (e.target.matches("#settings-button")) {
     document.getElementById("settings-modal").hidden = false
-  } else if (e.target.matches("#statistics-button")) {
-    document.getElementById("statistics-modal").hidden = false
   } else if (e.target.matches(".close-modal-button") || e.target.matches(".overlay")) {
     document.getElementById("help-modal").hidden = true
     document.getElementById("settings-modal").hidden = true
-    document.getElementById("statistics-modal").hidden = true
   } else if (e.target.matches("#dark-theme")) {
     const on = e.target.toggleAttribute("checked")
     document.querySelector("body").classList.toggle("nightmode", on)
@@ -199,11 +196,11 @@ function handleMouseClick(e) {
     saveSettings()
   } else if (e.target.matches("#share-button")) {
     if (navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(window.unicodeGameTranscript).then(function() {
+      navigator.clipboard.writeText(createUnicodeGameTranscript()).then(function() {
         showAlert("Copied to clipboard")
       }, function (err) {
         showAlert("Copying failed: " + e)
-      });
+      })
     } else {
       showAlert("Copying failed: navigator.clipboard.writeText is not supported")
     }
@@ -363,6 +360,32 @@ function shakeTiles(tiles) {
   })
 }
 
+function createUnicodeGameTranscript() {
+  console.assert(window.gameOver)
+  const usedRows = guessGrid.querySelectorAll("[data-letter]").length / WORD_LENGTH
+
+  let transcript = ""
+  let accumulator = []
+  const greenSquare = document.querySelector("body").classList.contains("colorblind") ? "\u{1F7E7}" : "\u{1F7E9}"
+  const yellowSquare = document.querySelector("body").classList.contains("colorblind") ? "\u{1F7E6}" : "\u{1F7E8}"
+  const whiteSquare = document.querySelector("body").classList.contains("nightmode") ? "\u{2B1B}" : "\u{2B1C}"
+  for (let e of guessGrid.querySelectorAll("[data-letter]")) {
+    accumulator.push(e.dataset.state == "correct" ? greenSquare :
+                     e.dataset.state == "present" ? yellowSquare : whiteSquare)
+    if (accumulator.length === WORD_LENGTH) {
+      transcript += "\n" + accumulator.join("")
+      accumulator = []
+    }
+  }
+  console.assert(accumulator.length === 0)
+
+  if (transcript.endsWith(greenSquare+greenSquare+greenSquare+greenSquare+greenSquare)) {
+    return "Birdle #" + (targetWords.indexOf(targetWord) + 1) + " " + usedRows + "/6\n" + transcript
+  } else {
+    return "Birdle #" + (targetWords.indexOf(targetWord) + 1) + " X/6\n" + transcript
+  }
+}
+
 function checkWinLose(guess, tiles) {
   const usedRows = guessGrid.querySelectorAll("[data-letter]").length / WORD_LENGTH
   const remainingRows = guessGrid.querySelectorAll(":not([data-letter])").length / WORD_LENGTH
@@ -372,30 +395,14 @@ function checkWinLose(guess, tiles) {
     const compliments = ["Genius", "Magnificent", "Impressive", "Splendid", "Great", "Phew"]
     showAlert(compliments[usedRows - 1], 5000)
     danceTiles(tiles)
-    window.unicodeGameTranscript = "Birdle #" + (targetWords.indexOf(targetWord) + 1) + " " + usedRows + "/6\n"
   } else if (remainingRows === 0) {
     stopInteraction()
     showAlert(targetWord.toUpperCase(), null)
-    window.unicodeGameTranscript = "Birdle #" + (targetWords.indexOf(targetWord) + 1) + " X/6\n"
   } else {
     return
   }
 
-  let transcript = []
-  const greenSquare = document.querySelector("body").classList.contains("colorblind") ? "\u{1F7E7}" : "\u{1F7E9}"
-  const yellowSquare = document.querySelector("body").classList.contains("colorblind") ? "\u{1F7E6}" : "\u{1F7E8}"
-  const whiteSquare = document.querySelector("body").classList.contains("nightmode") ? "\u{2B1B}" : "\u{2B1C}"
-  for (let e of guessGrid.querySelectorAll("[data-letter]")) {
-    transcript.push(e.dataset.state == "correct" ? greenSquare :
-                    e.dataset.state == "present" ? yellowSquare : whiteSquare)
-    if (transcript.length === WORD_LENGTH) {
-      window.unicodeGameTranscript += transcript.join("") + "\n"
-      transcript = []
-    }
-  }
-  console.assert(transcript.length === 0)
-
-  let e = document.querySelector("#statistics-button")
+  let e = document.querySelector("#share-button")
   e.classList.toggle("disabled-button", false)
   window.gameOver = true
   startInteraction()
