@@ -91,10 +91,6 @@
         overflow-y: hidden;
       }
 
-.key svg {
-  pointer-events: none;
-}
-
 .guess-grid {
   display: grid;
   justify-content: center;
@@ -342,11 +338,17 @@ button.icon {
   border: none;
   cursor: pointer;
   padding: 0 4px;
+  opacity: 1;
+  transition: opacity 500ms ease-in-out;
 }
 @media only screen and (min-device-width: 320px) and (max-device-width: 480px) {
   button.icon {
     padding: 0 16px;
   }
+}
+button.disabled-button {
+  display: hidden;
+  opacity: 0;
 }
 
 button svg {
@@ -359,8 +361,10 @@ button svg {
   height: 100%;
   top: 0;
   left: 0;
+  display: flex;
   justify-content: center;
-  background-color: var(--color-background);
+  align-items: center;
+  background-color: var(--opacity-50);
   animation: SlideIn 100ms linear;
   z-index: 2000;
 }
@@ -516,4 +520,7 @@ header .modal-title {
 }
 #settings-modal .control[checked] .knob {
   transform: translateX(calc(100% - 4px));
+}
+#settings-modal .disabled-control .switch {
+  opacity: 0.5;
 }
