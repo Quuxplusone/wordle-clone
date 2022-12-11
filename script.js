@@ -1,5 +1,7 @@
 const dictionary = [
   // Singular bird names
+  "buteo",
+  "eyass",
   "drake",
   "crake",
   "scaup",
