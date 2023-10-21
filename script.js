@@ -174,12 +174,16 @@ function stopInteraction() {
   document.removeEventListener("keydown", handleKeyPress)
 }
 
+function acceptGameInput() {
+  return (document.getElementById("help-modal").hidden && document.getElementById("settings-modal").hidden && !window.gameOver)
+}
+
 function handleMouseClick(e) {
-  if (e.target.matches("[data-key]") && !gameOver) {
+  if (e.target.matches("[data-key]") && acceptGameInput()) {
     pressKey(e.target.dataset.key)
-  } else if (e.target.matches("[data-enter]") && !gameOver) {
+  } else if (e.target.matches("[data-enter]") && acceptGameInput()) {
     submitGuess()
-  } else if (e.target.matches("[data-delete]") && !gameOver) {
+  } else if (e.target.matches("[data-delete]") && acceptGameInput()) {
     deleteKey()
   } else if (e.target.matches("#help-button")) {
     document.getElementById("help-modal").hidden = false
@@ -226,11 +230,14 @@ function restoreSettings() {
 }
 
 function handleKeyPress(e) {
-  if (e.key === "Enter") {
+  if (e.key === "Escape") {
+    document.getElementById("help-modal").hidden = true
+    document.getElementById("settings-modal").hidden = true
+  } else if ((e.key === "Enter") && acceptGameInput()) {
     submitGuess()
-  } else if (e.key === "Backspace" || e.key === "Delete") {
+  } else if ((e.key === "Backspace" || e.key === "Delete") && acceptGameInput()) {
     deleteKey()
-  } else if (e.key.match(/^[a-z]$/)) {
+  } else if (e.key.match(/^[a-z]$/) && acceptGameInput()) {
     pressKey(e.key)
   }
 }
